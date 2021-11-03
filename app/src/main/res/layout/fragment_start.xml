@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".StartFragment"
+    android:orientation="vertical"
+    android:gravity="center">
+
+
+    <Button
+        android:id="@+id/scrollviewBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ScrollView Example"
+        android:drawableEnd="@drawable/ic_baseline_sentiment_very_dissatisfied_24"
+        android:drawableTint="?colorOnPrimary"/>
+
+    <Button
+        android:id="@+id/recyclerviewBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="RecyclerView Example"
+        android:layout_marginTop="32dp"
+        android:drawableEnd="@drawable/ic_baseline_sentiment_very_satisfied_24"
+        android:drawableTint="?colorOnPrimary"/>
+
+</LinearLayout>

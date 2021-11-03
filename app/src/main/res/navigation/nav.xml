@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav.xml"
+    app:startDestination="@id/startFragment">
+
+    <fragment
+        android:id="@+id/scrollingFragment"
+        android:name="pt.ipbeja.listsdemo.ui.scrollview.ScrollingFragment"
+        android:label="fragment_scrolling"
+        tools:layout="@layout/fragment_scrolling" />
+    <fragment
+        android:id="@+id/startFragment"
+        android:name="pt.ipbeja.listsdemo.StartFragment"
+        android:label="fragment_start"
+        tools:layout="@layout/fragment_start" >
+        <action
+            android:id="@+id/action_startFragment_to_scrollingFragment"
+            app:destination="@id/scrollingFragment" />
+        <action
+            android:id="@+id/action_startFragment_to_recyclerViewFragment"
+            app:destination="@id/recyclerViewFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/recyclerViewFragment"
+        android:name="pt.ipbeja.listsdemo.ui.recycler.RecyclerViewFragment"
+        android:label="RecyclerViewFragment" />
+</navigation>
