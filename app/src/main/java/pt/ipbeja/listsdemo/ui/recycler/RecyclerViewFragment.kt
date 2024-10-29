@@ -8,11 +8,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import pt.ipbeja.listsdemo.ui.utils.TAG
+import pt.ipbeja.listsdemo.ui.utils.content
 import pt.ipbeja.listsdemo.R
 import pt.ipbeja.listsdemo.databinding.FragmentRecyclerviewBinding
 import pt.ipbeja.listsdemo.databinding.ListItemBinding
-import pt.ipbeja.listsdemo.ui.utils.TAG
-import pt.ipbeja.listsdemo.ui.utils.content
 
 class RecyclerViewFragment : Fragment() {
 

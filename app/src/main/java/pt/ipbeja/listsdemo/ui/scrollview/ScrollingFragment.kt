@@ -4,13 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
+
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import pt.ipbeja.listsdemo.R
-import pt.ipbeja.listsdemo.databinding.FragmentScrollingBinding
+
+
 import pt.ipbeja.listsdemo.ui.utils.content
+import pt.ipbeja.listsdemo.databinding.FragmentScrollingBinding
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
