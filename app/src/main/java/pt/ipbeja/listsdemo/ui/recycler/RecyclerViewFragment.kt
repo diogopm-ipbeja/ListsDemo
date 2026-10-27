@@ -1,36 +1,44 @@
 package pt.ipbeja.listsdemo.ui.recycler
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import pt.ipbeja.listsdemo.ui.utils.TAG
 import pt.ipbeja.listsdemo.ui.utils.content
-import pt.ipbeja.listsdemo.R
 import pt.ipbeja.listsdemo.databinding.FragmentRecyclerviewBinding
 import pt.ipbeja.listsdemo.databinding.ListItemBinding
 
 class RecyclerViewFragment : Fragment() {
 
+    companion object {
+        // false -> MyAdapter (manual notifyItem* calls), true -> MyListAdapter (DiffUtil)
+        private const val USE_LIST_ADAPTER = false
+    }
 
-    private lateinit var adapter: MyAdapter
-    private lateinit var binding: FragmentRecyclerviewBinding
+    private lateinit var adapter: RecyclerView.Adapter<MyViewHolder>
+
+    // The view is destroyed while the fragment stays in the back stack,
+    // so the binding must not outlive it.
+    private var _binding: FragmentRecyclerviewBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        this.adapter = MyAdapter()
+        this.adapter = if (USE_LIST_ADAPTER) MyListAdapter() else MyAdapter()
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View = with(FragmentRecyclerviewBinding.inflate(inflater)) {
-        binding = this
+    ): View = with(FragmentRecyclerviewBinding.inflate(inflater, container, false)) {
+        _binding = this
         root
     }
 
@@ -41,58 +49,94 @@ class RecyclerViewFragment : Fragment() {
         binding.recyclerview.adapter = adapter
 
         binding.viewsCountBtn.setOnClickListener {
-            val c = binding.viewsCountInput.content
-            val count = if(c.isBlank()) 0 else c.toInt()
+            val count = binding.viewsCountInput.content.toIntOrNull() ?: 0
             addItemsToList(count)
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun addItemsToList(count: Int) {
         val strings = List(count) {
             "Item number ${adapter.itemCount + it + 1}"
         }
-        adapter.addItems(strings)
+        when (val a = adapter) {
+            is MyAdapter -> a.addItems(strings)
+            is MyListAdapter -> a.submitList(a.currentList + strings)
+        }
     }
 }
 
 
-class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-    private val binding = ListItemBinding.bind(view)
+class MyViewHolder(private val binding: ListItemBinding) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(data: String) {
         binding.name.text = data
+    }
+
+    companion object {
+        fun create(parent: ViewGroup) = MyViewHolder(
+            ListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        )
     }
 }
 
 class MyAdapter : RecyclerView.Adapter<MyViewHolder>() {
 
-    private var viewHolderCounter = 0 // for demo purposes
+    // for demo purposes: few ViewHolders are created, but binds keep growing as we scroll
+    private var viewHolderCounter = 0
+    private var bindCounter = 0
 
-    private var data : MutableList<String> = mutableListOf()
-        @SuppressLint("NotifyDataSetChanged")
-        set(value) {
-            field = value
-            notifyDataSetChanged()
-        }
+    private val data: MutableList<String> = mutableListOf()
 
-    fun addItems(data: List<String>) {
-        val start = data.size
-        this.data.addAll(data)
-        notifyItemRangeInserted(start, data.size)
+    fun addItems(items: List<String>) {
+        val start = this.data.size
+        this.data.addAll(items)
+        // Only tell the RecyclerView what changed. notifyDataSetChanged() would
+        // rebind every visible item and skip the insert animations.
+        notifyItemRangeInserted(start, items.size)
     }
-
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         Log.i(TAG, "onCreateViewHolder: ViewHolder count: ${++viewHolderCounter}")
-        val v = LayoutInflater.from(parent.context).inflate(R.layout.list_item, parent, false)
-        return MyViewHolder(v)
+        return MyViewHolder.create(parent)
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
+        Log.i(TAG, "onBindViewHolder: bind count: ${++bindCounter}")
         holder.bind(data[position])
     }
 
     override fun getItemCount() = data.size
 
+}
+
+/**
+ * Same as [MyAdapter], but ListAdapter keeps the list and uses DiffUtil
+ * to work out which notifyItem* calls to make when a new list is submitted.
+ */
+class MyListAdapter : ListAdapter<String, MyViewHolder>(DIFF_CALLBACK) {
+
+    private var viewHolderCounter = 0 // for demo purposes
+    private var bindCounter = 0
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
+        Log.i(TAG, "onCreateViewHolder: ViewHolder count: ${++viewHolderCounter}")
+        return MyViewHolder.create(parent)
+    }
+
+    override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
+        Log.i(TAG, "onBindViewHolder: bind count: ${++bindCounter}")
+        holder.bind(getItem(position))
+    }
+
+    companion object {
+        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<String>() {
+            override fun areItemsTheSame(oldItem: String, newItem: String) = oldItem == newItem
+            override fun areContentsTheSame(oldItem: String, newItem: String) = oldItem == newItem
+        }
+    }
 }

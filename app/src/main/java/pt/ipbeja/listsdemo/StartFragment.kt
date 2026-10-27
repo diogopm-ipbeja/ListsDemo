@@ -11,14 +11,20 @@ import pt.ipbeja.listsdemo.databinding.FragmentStartBinding
 class StartFragment : Fragment() {
 
 
-    private lateinit var binding: FragmentStartBinding
+    private var _binding: FragmentStartBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View = with(FragmentStartBinding.inflate(inflater)) {
-        binding = this
+    ): View = with(FragmentStartBinding.inflate(inflater, container, false)) {
+        _binding = this
         root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
