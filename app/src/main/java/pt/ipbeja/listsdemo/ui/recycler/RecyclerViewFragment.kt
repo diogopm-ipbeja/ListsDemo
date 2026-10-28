@@ -76,12 +76,6 @@ class MyViewHolder(private val binding: ListItemBinding) : RecyclerView.ViewHold
     fun bind(data: String) {
         binding.name.text = data
     }
-
-    companion object {
-        fun create(parent: ViewGroup) = MyViewHolder(
-            ListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        )
-    }
 }
 
 class MyAdapter : RecyclerView.Adapter<MyViewHolder>() {
@@ -102,7 +96,9 @@ class MyAdapter : RecyclerView.Adapter<MyViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         Log.i(TAG, "onCreateViewHolder: ViewHolder count: ${++viewHolderCounter}")
-        return MyViewHolder.create(parent)
+
+        val binding = ListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return MyViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
@@ -125,7 +121,8 @@ class MyListAdapter : ListAdapter<String, MyViewHolder>(DIFF_CALLBACK) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         Log.i(TAG, "onCreateViewHolder: ViewHolder count: ${++viewHolderCounter}")
-        return MyViewHolder.create(parent)
+        val binding = ListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return MyViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
